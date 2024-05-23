@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
 	name='bellman_tools',
-	version='0.01',
+	version='0.1',
 	description='bellman_tools',
 	url='git@github.com:davidbellman/bellman_tools.git',
 	author='David Bellaiche',

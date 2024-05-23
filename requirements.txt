@@ -1,0 +1,7 @@
+pandas
+numpy
+SQLAlchemy==1.4.39
+pytz
+python-dateutil
+pyodbc
+python-dotenv

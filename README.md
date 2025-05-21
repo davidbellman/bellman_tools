@@ -4,7 +4,7 @@ Python tools to upload data into SQL Server using SQL Alchemy
 
 ## Installation
  - ```pip install bellman_tools```
- - Install the requirements (SQLAlchemy version needs to be bellow 2.0 - working on the v1.4.39)
+ - Install the requirements (SQLAlchemy version needs to be below 2.0 - working on the v1.4.39)
 
 
 ## Usage

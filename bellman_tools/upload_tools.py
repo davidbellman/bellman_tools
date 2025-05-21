@@ -22,7 +22,7 @@ class Upload:
 			str_existing_query: str = None,
 			insert_via_pandas: bool = False,
 			insert_line_by_line: bool = False,
-			col_percision: Dict[str, int] = None,
+			col_precision: Dict[str, int] = None,
 			cast_to_existing_dtypes: bool = True,
 			df_existing: pd.DataFrame = None,
 			replace_nan=False,
@@ -31,9 +31,9 @@ class Upload:
 			add_inserted_host: bool = True,
 	):
 		"""Args:
-		- col_percision: a dict containing rounding percision for columns for
-			when you do the comparison. This helps avoid
-			overflow issues causing false duplicates being inserted into DB
+		- col_precision: a dict containing rounding precision for columns for
+		when you do the comparison. This helps avoid
+		overflow issues causing false duplicates being inserted into DB
 		"""
 
 		ignored_columns = ["ID", "InsertedAt", "InsertedBy", "InsertedHost"]
@@ -61,9 +61,9 @@ class Upload:
 					replace_nan=replace_nan
 				)
 
-		if df_existing is not None and col_percision is not None:
-			df_incoming = df_incoming.round(col_percision)
-			df_existing = df_existing.round(col_percision)
+		if df_existing is not None and col_precision is not None:
+			df_incoming = df_incoming.round(col_precision)
+			df_existing = df_existing.round(col_precision)
 
 		df_diff = sql_tools.compare_df_with_existing_and_get_only_new_rows(
 			df_incoming=df_incoming,

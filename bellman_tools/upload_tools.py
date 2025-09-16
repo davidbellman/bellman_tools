@@ -1,15 +1,13 @@
-import datetime
 from typing import List, Dict
-import os
-
 import pandas as pd
 import numpy as np
+from sqlalchemy import MetaData
 
 from bellman_tools import sql_tools
 
 class Upload:
 	def __init__(self,sql: sql_tools.Sql):
-		self.Sql = sql
+		self.sql = sql
 
 	def load_basic_df_to_db(
 			self,
@@ -56,7 +54,7 @@ class Upload:
 				str_existing_query = f"SELECT * FROM " + SQL_Alchemy_Table.__tablename__
 
 			if str_existing_query is not None:
-				df_existing = self.Sql.load_dataframe_from_query(
+				df_existing = self.sql.load_dataframe_from_query(
 					sql_query=str_existing_query,
 					replace_nan=replace_nan
 				)
@@ -80,7 +78,7 @@ class Upload:
 
 			df_diff = df_diff.replace({np.nan: None})
 
-			self.Sql.save_dataframe_to_sql_alchemy_table(
+			self.sql.save_dataframe_to_sql_alchemy_table(
 				df=df_diff,
 				SQL_Alchemy_Table=SQL_Alchemy_Table,
 				object_casting=True,
@@ -96,7 +94,6 @@ class Upload:
 
 	def create_schema(self, table_name: str):
 
-		from sqlalchemy import MetaData
 		meta = MetaData()
 		meta.reflect(bind=self.sql.engine, only=[table_name])
 		table = meta.tables[table_name]

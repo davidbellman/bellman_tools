@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import MetaData
 
-from bellman_tools import sql_tools
+# from bellman_tools import sql_tools
+import sql_tools
 
 class Upload:
 	def __init__(self,sql: sql_tools.Sql):
@@ -134,14 +135,17 @@ class Upload:
 
 
 if __name__ == '__main__':
+
 	SQL = sql_tools.Sql(db='SAM')
 	UPLOAD = Upload(sql=SQL)
 
-	from bellman_tools.database import Test
+	# from bellman_tools.database import Test
 
-	df = pd.DataFrame([dict(Test='Testing with Python #2')])
+	# df = pd.DataFrame([dict(Test='Testing with Python #2')])
 
-	UPLOAD.load_basic_df_to_db(
-		df,
-		SQL_Alchemy_Table=Test.Test,
-	)
+	# UPLOAD.load_basic_df_to_db(
+	# 	df,
+	# 	SQL_Alchemy_Table=Test.Test,
+	# )
+
+	print(UPLOAD.create_schema(table_name='Test'))

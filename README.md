@@ -11,7 +11,7 @@ Python tools to upload data into SQL Server using SQL Alchemy
 ### SQL Tools
 
 To retrieve data from a SQL Server.
-You need first to add connection string to the .env file in the root folder.
+You need first to add connection string to the .env file in the project root folder.
 
 Example of the .env file:
 
@@ -24,6 +24,15 @@ from bellman_tools import sql_tools
 SQL = sql_tools.Sql(db='DB')
 df = SQL.load_dataframe_from_query("SELECT TOP 1 * FROM Test")
 ``` 
+
+#### Notes on environment loading
+
+- `bellman_tools.sql_tools` looks for a `.env` file only in your current
+  working directory (typically your project root) when it is imported. If it
+  does not find one, it prints the current directory and continues.
+- Best practice is to set environment variables outside of your code (shell,
+  CI/CD secrets, process manager). The `.env` loading is a convenience
+  fallback.
 
 ### Upload Tools
 

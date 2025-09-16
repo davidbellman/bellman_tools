@@ -5,7 +5,7 @@ long_description = (Path(__file__).parent / "README.md").read_text(encoding="utf
 
 setup(
 	name='bellman_tools',
-	version='0.1',
+	version='0.1.1',
 	description='bellman_tools',
 	long_description=long_description,
 	long_description_content_type='text/markdown',

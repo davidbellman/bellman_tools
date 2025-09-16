@@ -10,16 +10,16 @@ import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 from sqlalchemy import text
 
-# Load .env from explicit path or by searching from the current working directory upward.
+# Load .env only from the current working directory (user's working dir).
 # Best practice is to let the application load env vars; this is a convenience fallback.
-_dotenv_path = os.getenv("BELLMAN_DOTENV_PATH")
-if _dotenv_path:
-    load_dotenv(_dotenv_path, override=False)
+_cwd_env = os.path.join(os.getcwd(), ".env")
+if os.path.isfile(_cwd_env):
+    load_dotenv(_cwd_env, override=False)
 else:
-    load_dotenv(find_dotenv(usecwd=True), override=False)
+    print(f"No .env file found in current directory: {os.getcwd()}")
 
 
 class Sql:

@@ -95,21 +95,29 @@ class Upload:
 
 	def create_schema(self, table_name: str):
 
+		from sqlalchemy import MetaData
 		meta = MetaData()
 		meta.reflect(bind=self.sql.engine, only=[table_name])
 		table = meta.tables[table_name]
 
 		all_fields = ""
-
+        
+		column_id_name = "ID"
 		for column in table.columns:
 			# print(column.name, column.type, column.nullable, column.primary_key)
 			type_str = str(column.type).split('(')[0].title()
 
-			if type_str == 'Varchar' or type_str == 'Varchar Collate "Sql_Latin1_General_Cp1_Ci_As"': type_str = 'String'
+			if type_str in (
+            	'Varchar',
+            	'Varchar Collate "Sql_Latin1_General_Cp1_Ci_As"',
+                'Nvarchar',
+                'Nvarchar Collate "Sql_Latin1_General_Cp1_Ci_As"',
+            ): type_str = 'String'
 			if type_str == 'Bigint' : type_str = 'BigInteger'
 			if type_str == 'Bit' : type_str = 'Boolean'
-			if type_str == 'Datetime' : type_str = 'DateTime'
+			if type_str in ('Datetime','Datetime2') : type_str = 'DateTime'
 			if column.name == 'ID' : continue
+			if column.name == 'id' : column_id_name == "id"  
 
 			all_fields += f"\t{column.name} = Column({type_str})\n"
 
@@ -127,7 +135,7 @@ class Upload:
 		class {table_name}(Base, DBTemplate):
 			__tablename__ = '{table_name}'
 			__table_args__ = {{'schema': 'dbo'}}
-			ID = Column(Integer, primary_key=True)
+			{column_id_name} = Column(Integer, primary_key=True)
 			{all_fields}
 		"""
 

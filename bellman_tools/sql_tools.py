@@ -1,5 +1,4 @@
 import time
-import uuid
 import datetime
 from typing import Any
 
@@ -9,20 +8,25 @@ import getpass
 import socket
 import os
 
-from sqlalchemy import MetaData
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from sqlalchemy import text
 
-load_dotenv()
+# Load .env from explicit path or by searching from the current working directory upward.
+# Best practice is to let the application load env vars; this is a convenience fallback.
+_dotenv_path = os.getenv("BELLMAN_DOTENV_PATH")
+if _dotenv_path:
+    load_dotenv(_dotenv_path, override=False)
+else:
+    load_dotenv(find_dotenv(usecwd=True), override=False)
 
 
 class Sql:
 	def __init__(
 			self,
 			server="default",
-			db="SAM",
+			db="master",
 			engine=None,
 			session=None,
 			fast_executemany=True,
@@ -31,6 +35,10 @@ class Sql:
 
 		# Todo based on the server name, change the connection string
 		DATABASE_CONNECTION_STRING = os.getenv("DATABASE_CONNECTION_STRING")
+		if not DATABASE_CONNECTION_STRING:
+			raise RuntimeError(
+				"Missing env var DATABASE_CONNECTION_STRING. Define it in your environment or .env"
+			)
 
 		if engine is None:
 			engine = create_engine(
@@ -53,7 +61,8 @@ class Sql:
 			replace_nan: bool = True
 	) -> pd.DataFrame:
 		try:
-			df = pd.read_sql(text(sql_query), self.engine.connect())
+			# df = pd.read_sql(text(sql_query), self.engine.connect())
+			df = pd.read_sql(text(sql_query), self.engine) # Needed in SQLAlchemy>2 version
 			if replace_nan:
 				df.replace({np.nan: None}, inplace=True)
 				df.replace({pd.NaT: None}, inplace=True)
@@ -77,10 +86,15 @@ class Sql:
 
 	def execute_sql(self, sql_query):
 		try:
-			res = self.engine.execute(sql_query)
-			return res
+			# Use a transactional context compatible with SQLAlchemy 1.4/2.x
+			with self.engine.begin() as connection:
+				connection.execute(text(sql_query))
+			return True
 		except Exception as e:
 			print("ERROR1134 : ", e)
+			print(sql_query)
+			return False
+
 
 	def add_to_session_and_commit(self, new_entry):
 		try:
@@ -144,10 +158,10 @@ class Sql:
 				)
 			elif insert_line_by_line:
 				for index, row in df.iterrows():
-					new_entry = SQL_Alchemy_Table(**row)
+					row_dict = row.to_dict()
 					sql_insert = insert_sql_query(
 						table_name=SQL_Alchemy_Table.__tablename__,
-						dico_name_value=new_entry.to_dict(),
+						dico_name_value=row_dict,
 					)
 					print(sql_insert)
 					self.execute_sql(sql_query=sql_insert)
@@ -165,19 +179,18 @@ class Sql:
 			self.session.rollback()
 			print("Printing the top 10 rows INSERT")
 			for index, row in df[:10].iterrows():
-				new_entry = SQL_Alchemy_Table(**row)
 				print(
 					insert_sql_query(
 						table_name=SQL_Alchemy_Table.__tablename__,
-						dico_name_value=new_entry.to_dict(),
+						dico_name_value=row.to_dict(),
 					)
 				)
 			print("ERROR1635 : Session rolled back ....")
 
-			execution_time = time.time() - start
-			print("Execution time : ", execution_time)
-			if execution_time > 0:
-				print("Speed: ", (len(df) / 1000) / execution_time," k/s")
+		execution_time = time.time() - start
+		print("Execution time : ", execution_time)
+		if execution_time > 0:
+			print("Speed: ", (len(df) / 1000) / execution_time," k/s")
 
 
 def update_sql_query_for_id(table_name, dico_name_value, id):

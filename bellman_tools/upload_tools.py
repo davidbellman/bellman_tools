@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import MetaData
 
-# from bellman_tools import sql_tools
-import sql_tools
+from bellman_tools import sql_tools
+# import sql_tools => debug mode
 
 class Upload:
 	def __init__(self,sql: sql_tools.Sql):

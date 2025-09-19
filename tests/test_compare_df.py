@@ -89,4 +89,3 @@ def test_cast_to_existing_dtypes():
         expected_cast.reset_index(drop=True).sort_index(axis=1),
         check_dtype=False,
     )
-

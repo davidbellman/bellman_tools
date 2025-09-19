@@ -114,8 +114,9 @@ class Upload:
                 'Nvarchar Collate "Sql_Latin1_General_Cp1_Ci_As"',
             ): type_str = 'String'
 			if type_str == 'Bigint' : type_str = 'BigInteger'
+			if type_str == 'Decimal' : type_str = 'Float'
 			if type_str == 'Bit' : type_str = 'Boolean'
-			if type_str in ('Datetime','Datetime2') : type_str = 'DateTime'
+			if type_str in ('Datetime','Datetime2','Datetimeoffset') : type_str = 'DateTime'
 			if column.name == 'ID' : continue
 			if column.name == 'id' : column_id_name == "id"  
 

@@ -1,3 +1,5 @@
 include README.md
 include LICENSE
+recursive-include bellman_tools/templates *.html
+recursive-include bellman_tools/static *
 recursive-exclude tests *

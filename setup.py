@@ -5,8 +5,8 @@ long_description = (Path(__file__).parent / "README.md").read_text(encoding="utf
 
 setup(
     name='bellman_tools',
-    version='0.1.5',
-    description='bellman_tools',
+    version='0.2.0',
+    description='A set of tools in Python for data manipulation, database interaction, scheduling and financial analysis for Hedge Funds.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/davidbellman/bellman_tools',
@@ -20,8 +20,13 @@ setup(
         'sqlalchemy>=2.0',
         'pyodbc',
         'python-dotenv',
+        'flask>=2.3.0',
+        'schedule',
     ],
     include_package_data=True,
+    package_data={
+        'bellman_tools': ['templates/*.html', 'static/*'],
+    },
     python_requires='>=3.10',
     classifiers=[
         'Programming Language :: Python :: 3',

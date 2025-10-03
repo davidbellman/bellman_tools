@@ -5,3 +5,5 @@ pytz
 python-dateutil
 pyodbc
 python-dotenv
+schedule
+flask>=2.3.0

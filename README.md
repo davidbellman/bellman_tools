@@ -90,6 +90,135 @@ UPLOAD.load_basic_df_to_db(
 )
 ```
 
+## Scheduler tools
+
+Use `bellman_tools.scheduler_tools` to run scheduled tasks with logging and error handling.
+
+```python
+    TSM = scheduler_tools.TaskSchedulerManager(sql_tools.Sql())
+    TSM.run_scheduler_in_loop()
+```
+
+You need to create 4 tables in your database first :
+- Task_Scheduler
+- Task_Scheduler_Log
+- Task_Scheduled
+- Log_Task_Scheduler
+
+> SQL script to create the 4 required tables for bellman_tools.scheduler_tools
+
+```sql
+CREATE TABLE [dbo].[Task_Scheduler] (
+    [ID] INT IDENTITY(1,1) PRIMARY KEY,
+    [ScriptName] NVARCHAR(255) NOT NULL,
+    [ScriptFolder] NVARCHAR(255) NULL,
+    [Every] NVARCHAR(50) NULL,
+    [AtTime] NVARCHAR(50) NULL,
+    [Enable] BIT NOT NULL DEFAULT 1,
+    [ToRunAsap] BIT NOT NULL DEFAULT 0,
+    [InsertedAt] DATETIME DEFAULT GETDATE(),
+    [InsertedBy] NVARCHAR(255) DEFAULT SYSTEM_USER,
+    [InsertedHost] NVARCHAR(255) DEFAULT HOST_NAME()
+);
+
+CREATE TABLE [dbo].[Task_Scheduler_Log] (
+    [ID] INT IDENTITY(1,1) PRIMARY KEY,
+    [TaskSchedulerID] INT NULL,
+    [LogTime] DATETIME DEFAULT GETDATE(),
+    [Status] NVARCHAR(50) NULL,
+    [Message] NVARCHAR(MAX) NULL,
+    [InsertedAt] DATETIME DEFAULT GETDATE(),
+    [InsertedBy] NVARCHAR(255) DEFAULT SYSTEM_USER,
+    [InsertedHost] NVARCHAR(255) DEFAULT HOST_NAME()
+);
+
+CREATE TABLE [dbo].[Task_Scheduled] (
+    [ID] INT IDENTITY(1,1) PRIMARY KEY,
+    [ScriptName] NVARCHAR(255) NOT NULL,
+    [ScriptFolder] NVARCHAR(255) NULL,
+    [NextRun] DATETIME NULL,
+    [RunBy] NVARCHAR(255) NULL,
+    [RunHost] NVARCHAR(255) NULL,
+    [HeartbeatID] NVARCHAR(255) NULL,
+    [InsertedAt] DATETIME DEFAULT GETDATE(),
+    [InsertedBy] NVARCHAR(255) DEFAULT SYSTEM_USER,
+    [InsertedHost] NVARCHAR(255) DEFAULT HOST_NAME()
+);
+
+CREATE TABLE [dbo].[Log_Task_Scheduler] (
+    [ID] INT IDENTITY(1,1) PRIMARY KEY,
+    [SessionID] NVARCHAR(255) NULL,
+    [ScriptName] NVARCHAR(255) NULL,
+    [ScriptFolder] NVARCHAR(255) NULL,
+    [Status] NVARCHAR(50) NULL,
+    [Message] NVARCHAR(MAX) NULL,
+    [LogTime] DATETIME DEFAULT GETDATE(),
+    [InsertedAt] DATETIME DEFAULT GETDATE(),
+    [InsertedBy] NVARCHAR(255) DEFAULT SYSTEM_USER,
+    [InsertedHost] NVARCHAR(255) DEFAULT HOST_NAME()
+);
+```
+
+### Task Scheduler Dashboard
+
+Launch a web-based dashboard to monitor and manage your scheduled tasks:
+
+```python
+from bellman_tools import scheduler_tools
+
+# Launch the dashboard on default port 5000
+scheduler_tools.RunDashboard()
+
+# Or specify a custom port
+scheduler_tools.RunDashboard(port=8080)
+
+# With custom SQL connection
+from bellman_tools import sql_tools
+sql = sql_tools.Sql(db='YourDatabase')
+scheduler_tools.RunDashboard(port=5000, sql=sql)
+```
+
+Then open your browser to: **http://localhost:5000**
+
+**Password Protection (Optional):**
+
+You can secure the dashboard with a password by setting an environment variable:
+
+```bash
+# In your .env file
+TASK_SCHEDULER_DASHBOARD_PASSWORD=your_secure_password
+```
+
+If this variable is set, users will be prompted to enter the password before accessing the dashboard. If not set, the dashboard is accessible without authentication.
+
+**Dashboard Features:**
+
+- 🎮 **Scheduler Control**: Start/stop the task scheduler directly from the dashboard with live status
+- 📊 **Real-time Statistics**: View total tasks, enabled tasks, scheduled runs, and recent executions
+- 📋 **Task Management**: Add, edit, and delete scheduled tasks directly from the web UI
+- 📅 **Next Runs**: See upcoming scheduled task executions
+- 📜 **Execution History**: Monitor the last 100 task executions with status and details
+- 💓 **Heartbeat Monitor**: View last heartbeat from each user/machine with status indicators
+- 📝 **Live Logs**: View real-time scheduler logs with color-coded log levels
+- 🔄 **Auto-refresh**: Dashboard updates every 30 seconds automatically
+- 👥 **Multi-user Support**: Toggle between viewing your tasks or all users' tasks
+- ✨ **Modern UI**: Beautiful, responsive interface with DataTables for sorting and filtering
+
+**Usage Tips:**
+
+- The dashboard requires Flask (`pip install flask` or it's in `requirements.txt`)
+- All CRUD operations on tasks are immediately reflected in the database
+- Use "Run ASAP" checkbox to trigger immediate task execution
+- The dashboard filters tasks by current user and host by default
+- **Start/Stop Scheduler**: Control the task scheduler directly from the dashboard
+  - Click "Start Scheduler" to begin running scheduled tasks
+  - Status shows "Running since [timestamp]" when active
+  - Click "Stop Scheduler" to safely stop the scheduler
+  - View live logs by clicking "View Logs" to see real-time execution details
+- **Password Protection**: Secure the dashboard by setting `TASK_SCHEDULER_DASHBOARD_PASSWORD` in your .env file
+  - If set, users must login before accessing the dashboard
+  - If not set, dashboard is open without authentication
+  - Logout button appears in navbar when password protection is enabled
 
 
 ## DataFrame comparison utility

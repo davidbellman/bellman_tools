@@ -1,6 +1,8 @@
-import pytest
+# import pytest
+# pd = pytest.importorskip("pandas")
 
-pd = pytest.importorskip("pandas")
+import pandas as pd
+
 
 from bellman_tools import sql_tools
 

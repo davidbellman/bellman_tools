@@ -5,7 +5,7 @@ long_description = (Path(__file__).parent / "README.md").read_text(encoding="utf
 
 setup(
     name='bellman_tools',
-    version='0.2.0',
+    version='0.2.1',
     description='A set of tools in Python for data manipulation, database interaction, scheduling and financial analysis for Hedge Funds.',
     long_description=long_description,
     long_description_content_type='text/markdown',

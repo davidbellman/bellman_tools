@@ -61,11 +61,10 @@ Then create a file in your project, e.g. `database\Test.py`:
 ```python
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String
-from bellman_tools.database.db_template import db_template as DBTemplate
 
 Base = declarative_base()
 
-class Test(Base, DBTemplate):
+class Test(Base):
     __tablename__ = "Test"
     __table_args__ = {"schema": "dbo"}
     ID = Column(Integer, primary_key=True)
